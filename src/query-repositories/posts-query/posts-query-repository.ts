@@ -13,7 +13,6 @@ export const postsQueryRepository = {
 
 
         let posts: PostEntityType[] = await postsCollection.find({}).sort(sortQuery).skip(paginateQuery.skip).limit(paginateQuery.limit).toArray();
-
         const allPosts = await postsCollection.find({}).sort(sortQuery).toArray()
         let pagesCount = 0
 

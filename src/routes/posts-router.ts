@@ -14,6 +14,9 @@ import {HTTP_STATUSES} from "../constants/http-statuses";
 import {ObjectId} from "mongodb";
 import {postsService} from "../domain/posts-service";
 import {postsQueryRepository} from "../query-repositories/posts-query/posts-query-repository";
+import {blogsRepositories} from "../repositories/blogs-repositories";
+import {blogsQueryRepository} from "../query-repositories/blogs-query/blogs-query-repository";
+import {BlogEntityType, BlogViewType} from "../types/blog-type";
 
 export const postValidators = [
     authorizationMiddleware,
@@ -86,12 +89,16 @@ postsRouter.get('/:id',
 postsRouter.post('/',
     ...postValidators,
     async (req: Request, res: Response) => {
+        let getBlogName
+      const getBlog:BlogViewType|boolean =  await blogsQueryRepository.getBlogById( req.body.blogId)
+        if(getBlog){
+            getBlogName = getBlog.name
         let newPost: PostCreateType = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId,
-            blogName: 'string',
+            blogName: getBlogName,
             createdAt: new Date().toISOString()
         }
 
@@ -106,6 +113,7 @@ postsRouter.post('/',
 
         } catch (error) {
             res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
+        }
         }
 
 

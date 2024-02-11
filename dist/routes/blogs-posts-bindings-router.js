@@ -18,6 +18,7 @@ const http_statuses_1 = require("../constants/http-statuses");
 const auth_validation_1 = require("../validation/auth-validation");
 const posts_validation_1 = require("../validation/posts-validation");
 const blogs_posts_bind_validation_1 = require("../validation/blogs-posts-bind-validation");
+const blogs_query_repository_1 = require("../query-repositories/blogs-query/blogs-query-repository");
 exports.blogsPostsBindRouter = (0, express_1.Router)({});
 exports.blogsPostBindValidators = [
     auth_validation_1.authorizationMiddleware,
@@ -59,26 +60,31 @@ exports.blogsPostsBindRouter.get('/:blogId/posts', blogs_posts_bind_validation_1
     }
 }));
 exports.blogsPostsBindRouter.post('/:blogId/posts', ...exports.blogsPostBindValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.params.blogId, 'params');
-    let newPost = {
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content,
-        blogId: req.params.blogId,
-        blogName: 'string',
-        createdAt: new Date().toISOString()
-    };
-    try {
-        const response = yield posts_service_1.postsService.createPost(newPost);
-        if (response instanceof mongodb_1.ObjectId) {
-            const createdPost = yield posts_query_repository_1.postsQueryRepository.getPostById(response);
-            res.status(http_statuses_1.HTTP_STATUSES.CREATED_201).send(createdPost);
-            return;
+    let getBlogName;
+    const getBlog = yield blogs_query_repository_1.blogsQueryRepository.getBlogById(req.params.blogId);
+    if (getBlog) {
+        getBlogName = getBlog.name;
+        console.log(req.params.blogId, 'params');
+        let newPost = {
+            title: req.body.title,
+            shortDescription: req.body.shortDescription,
+            content: req.body.content,
+            blogId: req.params.blogId,
+            blogName: getBlogName,
+            createdAt: new Date().toISOString()
+        };
+        try {
+            const response = yield posts_service_1.postsService.createPost(newPost);
+            if (response instanceof mongodb_1.ObjectId) {
+                const createdPost = yield posts_query_repository_1.postsQueryRepository.getPostById(response);
+                res.status(http_statuses_1.HTTP_STATUSES.CREATED_201).send(createdPost);
+                return;
+            }
+            res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
         }
-        res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
-    }
-    catch (error) {
-        res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
+        catch (error) {
+            res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
+        }
     }
 }));
 //# sourceMappingURL=blogs-posts-bindings-router.js.map

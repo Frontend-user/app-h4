@@ -44,7 +44,7 @@ export const blogsQueryRepository = {
         return response
     },
 
-    async getBlogById(id: string | ObjectId): Promise<BlogViewType | boolean> {
+    async getBlogById(id: string | ObjectId): Promise<BlogViewType | false> {
         console.log(id,'id')
         if (ObjectId.isValid(id) && typeof id === 'string' || id instanceof ObjectId) {
             const blog: BlogEntityType | null = await blogsCollection.findOne({_id: new ObjectId(id)})

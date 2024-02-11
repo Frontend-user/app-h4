@@ -18,6 +18,8 @@ import {
     blogsPostsBindingInputValidationMiddleware,
     postBlogBindIdExistValidation, postBlogsBindingBlogIdValidation,
 } from "../validation/blogs-posts-bind-validation";
+import {BlogViewType} from "../types/blog-type";
+import {blogsQueryRepository} from "../query-repositories/blogs-query/blogs-query-repository";
 
 export const blogsPostsBindRouter = Router({})
 export const blogsPostBindValidators = [
@@ -68,13 +70,17 @@ blogsPostsBindRouter.get('/:blogId/posts',
 blogsPostsBindRouter.post('/:blogId/posts',
     ...blogsPostBindValidators,
     async (req: Request, res: Response) => {
+        let getBlogName
+        const getBlog:BlogViewType|boolean =  await blogsQueryRepository.getBlogById( req.params.blogId)
+        if(getBlog){
+            getBlogName = getBlog.name
         console.log(req.params.blogId, 'params')
         let newPost: PostCreateType = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.params.blogId,
-            blogName: 'string',
+            blogName: getBlogName,
             createdAt: new Date().toISOString()
         }
 
@@ -89,5 +95,6 @@ blogsPostsBindRouter.post('/:blogId/posts',
 
         } catch (error) {
             res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
+        }
         }
     })
