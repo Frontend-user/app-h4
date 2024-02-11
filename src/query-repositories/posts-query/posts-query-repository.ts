@@ -8,7 +8,7 @@ import {BlogEntityType} from "../../types/blog-type";
 
 export const postsQueryRepository = {
     async getPosts(sortBy?: string, sortDirection?: string, pageNumber?: number, pageSize?: number) {
-        const sortQuery = blogsSorting.getSorting(sortBy, sortDirection)
+        const sortQuery = blogsSorting.getPostSorting(sortBy, sortDirection)
         const paginateQuery = blogsPaginate.getPagination(pageNumber, pageSize)
 
 

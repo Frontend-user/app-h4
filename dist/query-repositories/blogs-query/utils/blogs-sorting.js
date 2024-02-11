@@ -12,6 +12,17 @@ exports.blogsSorting = {
             sortQuery.createdAt = sortDirection === 'asc' ? 1 : -1;
         }
         return sortQuery;
+    },
+    getPostSorting(sortBy, sortDirection) {
+        let sortQuery = { createdAt: -1 };
+        if (sortBy) {
+            delete sortQuery.createdAt;
+            sortQuery[sortBy] = sortDirection === 'asc' ? -1 : -1;
+        }
+        if (sortDirection && !sortBy) {
+            sortQuery.createdAt = sortDirection === 'asc' ? 1 : -1;
+        }
+        return sortQuery;
     }
 };
 //# sourceMappingURL=blogs-sorting.js.map

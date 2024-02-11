@@ -17,7 +17,7 @@ const blogs_paginate_1 = require("../blogs-query/utils/blogs-paginate");
 exports.postsQueryRepository = {
     getPosts(sortBy, sortDirection, pageNumber, pageSize) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sortQuery = blogs_sorting_1.blogsSorting.getSorting(sortBy, sortDirection);
+            const sortQuery = blogs_sorting_1.blogsSorting.getPostSorting(sortBy, sortDirection);
             const paginateQuery = blogs_paginate_1.blogsPaginate.getPagination(pageNumber, pageSize);
             let posts = yield db_1.postsCollection.find({}).sort(sortQuery).skip(paginateQuery.skip).limit(paginateQuery.limit).toArray();
             const allPosts = yield db_1.postsCollection.find({}).sort(sortQuery).toArray();
