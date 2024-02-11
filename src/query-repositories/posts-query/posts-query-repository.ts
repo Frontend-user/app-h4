@@ -14,15 +14,17 @@ export const postsQueryRepository = {
 
         let posts: PostEntityType[] = await postsCollection.find({}).sort(sortQuery).skip(paginateQuery.skip).limit(paginateQuery.limit).toArray();
 
-        const allPosts = await postsCollection.find({}).toArray()
+        const allPosts = await postsCollection.find({}).sort(sortQuery).toArray()
         let pagesCount = 0
 
-        if (pageSize === Infinity || !pageSize) {
-            pageSize = 0
-        } else {
-            pagesCount = Math.ceil(allPosts.length / pageSize)
+        if(!pageSize){
+            pageSize = 10
         }
 
+        if(!pageNumber){
+            pageNumber = 1
+        }
+        pagesCount = Math.ceil(allPosts.length / pageSize)
         const fixArrayIds = posts.map((item => this.__changeIdFormat(item)))
 
         const response = {

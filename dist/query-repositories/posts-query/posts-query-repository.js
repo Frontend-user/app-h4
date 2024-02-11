@@ -20,14 +20,15 @@ exports.postsQueryRepository = {
             const sortQuery = blogs_sorting_1.blogsSorting.getSorting(sortBy, sortDirection);
             const paginateQuery = blogs_paginate_1.blogsPaginate.getPagination(pageNumber, pageSize);
             let posts = yield db_1.postsCollection.find({}).sort(sortQuery).skip(paginateQuery.skip).limit(paginateQuery.limit).toArray();
-            const allPosts = yield db_1.postsCollection.find({}).toArray();
+            const allPosts = yield db_1.postsCollection.find({}).sort(sortQuery).toArray();
             let pagesCount = 0;
-            if (pageSize === Infinity || !pageSize) {
-                pageSize = 0;
+            if (!pageSize) {
+                pageSize = 10;
             }
-            else {
-                pagesCount = Math.ceil(allPosts.length / pageSize);
+            if (!pageNumber) {
+                pageNumber = 1;
             }
+            pagesCount = Math.ceil(allPosts.length / pageSize);
             const fixArrayIds = posts.map((item => this.__changeIdFormat(item)));
             const response = {
                 "pagesCount": pagesCount,
