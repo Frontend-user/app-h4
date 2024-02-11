@@ -13,6 +13,7 @@ if(!url){
 
 console.log('url',url)
 
+
 export const client = new MongoClient(url)
 export const blogsCollection = client.db('db').collection<BlogEntityType | BlogCreateType>('blogs')
 export const postsCollection = client.db('db').collection<PostEntityType | PostCreateType>('posts')
