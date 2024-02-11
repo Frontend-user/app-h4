@@ -36,3 +36,4 @@ const runDb = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.runDb = runDb;
+//# sourceMappingURL=db.js.map

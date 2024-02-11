@@ -10,11 +10,12 @@ import {
     postTitleValidation
 } from "../validation/posts-validation";
 import {inputValidationMiddleware} from "../validation/blogs-validation";
-import {postsRepositories} from "../repositories/posts-repositories";
 import {HTTP_STATUSES} from "../constants/http-statuses";
 import {ObjectId} from "mongodb";
+import {postsService} from "../domain/posts-service";
+import {postsQueryRepository} from "../query-repositories/posts-query/posts-query-repository";
 
-const postValidators = [
+export const postValidators = [
     authorizationMiddleware,
     postTitleValidation,
     postDescValidation,
@@ -30,7 +31,32 @@ export const postsRouter = Router({})
 postsRouter.get('/',
     async (req: Request, res: Response) => {
         try {
-            const posts = await postsRepositories.getPosts()
+
+            let searchNameTerm
+            let sortBy
+            let sortDirection
+            let pageNumber
+            let pageSize
+            if (req.query.SearchNameTerm) {
+                searchNameTerm = String(req.query.SearchNameTerm)
+            }
+            if (req.query.sortBy) {
+                sortBy = String(req.query.sortBy)
+            }
+
+            if (req.query.sortDirection) {
+                sortDirection = String(req.query.sortDirection)
+            }
+            if(req.query.pageNumber) {
+                pageNumber = Number(req.query.pageNumber)
+            }
+            if(req.query.pageSize){
+                pageSize = Number(req.query.pageSize)
+            }
+
+
+
+            const posts = await postsQueryRepository.getPosts(sortBy, sortDirection, pageNumber,pageSize)
             res.status(HTTP_STATUSES.OK_200).send(posts)
         } catch (error) {
             console.error('Ошибка при получении данных из коллекции:', error);
@@ -43,7 +69,7 @@ postsRouter.get('/:id',
     postIdValidation,
     async (req: Request, res: Response) => {
         try {
-            const post = await postsRepositories.getPostById(req.params.id)
+            const post = await postsQueryRepository.getPostById(req.params.id)
             if (!post) {
                 res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
                 return
@@ -70,9 +96,9 @@ postsRouter.post('/',
         }
 
         try {
-            const response = await postsRepositories.createPost(newPost)
+            const response = await postsService.createPost(newPost)
             if (response instanceof ObjectId) {
-                const createdPost: PostViewType | boolean = await postsRepositories.getPostById(response)
+                const createdPost: PostViewType | boolean = await postsQueryRepository.getPostById(response)
                 res.status(HTTP_STATUSES.CREATED_201).send(createdPost)
                 return
             }
@@ -95,7 +121,7 @@ postsRouter.put('/:id',
             blogId: req.body.blogId
         }
         try {
-            const response: boolean = await postsRepositories.updatePost(new ObjectId(req.params.id), postDataToUpdate)
+            const response: boolean = await postsService.updatePost(new ObjectId(req.params.id), postDataToUpdate)
             res.sendStatus(response ? HTTP_STATUSES.NO_CONTENT_204 : HTTP_STATUSES.NOT_FOUND_404)
 
         } catch (error) {
@@ -109,7 +135,7 @@ postsRouter.delete('/:id',
     postIdValidation,
     async (req: Request, res: Response) => {
         try {
-            const response: boolean = await postsRepositories.deletePost(new ObjectId(req.params.id))
+            const response: boolean = await postsService.deletePost(new ObjectId(req.params.id))
             res.sendStatus(response ? HTTP_STATUSES.NO_CONTENT_204 : HTTP_STATUSES.NOT_FOUND_404)
         } catch (error) {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

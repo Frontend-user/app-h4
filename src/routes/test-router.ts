@@ -8,7 +8,8 @@ testRouter.delete('/all-data', async (req: Request, res: Response) => {
     try {
         await client.connect()
 
-        await client.db('blogs').collection('blogs').deleteMany({});
+        await client.db('db').collection('blogs').deleteMany({});
+        await client.db('db').collection('posts').deleteMany({});
 
         res.sendStatus(204)
 

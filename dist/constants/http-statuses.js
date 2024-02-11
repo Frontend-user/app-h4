@@ -8,3 +8,4 @@ exports.HTTP_STATUSES = {
     NOT_FOUND_404: 404,
     SERVER_ERROR_500: 500,
 };
+//# sourceMappingURL=http-statuses.js.map

@@ -4,7 +4,7 @@ import {ErrorType} from "../types/error-type";
 
 const pattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
 
-export const blogNameValidation = body('name').trim().isLength({min: 4, max: 15}).withMessage({
+export const blogNameValidation = body('name').trim().isLength({min:1, max: 15}).withMessage({
     message: 'name',
     field: 'name'
 })

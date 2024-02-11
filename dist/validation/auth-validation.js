@@ -13,3 +13,4 @@ const authorizationMiddleware = (req, res, next) => {
     }
 };
 exports.authorizationMiddleware = authorizationMiddleware;
+//# sourceMappingURL=auth-validation.js.map

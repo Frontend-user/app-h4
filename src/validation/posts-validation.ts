@@ -1,7 +1,9 @@
+
+import {blogsQueryRepository} from "../query-repositories/blogs-query/blogs-query-repository";
 import {body, check, validationResult, ValidationError} from "express-validator";
-import {blogsRepositories} from "../repositories/blogs-repositories";
 import {ObjectId} from "mongodb";
 import {BlogViewType} from "../types/blog-type";
+import {blogsService} from "../domain/blogs-service";
 
 export const postTitleValidation = body('title').trim().isLength({min: 4, max: 30}).withMessage({
     message: 'title is wrong',
@@ -24,7 +26,7 @@ export const postBlogIdValidation = body('blogId').trim().isLength({min: 1, max:
 })
 
 export const postBlogIdExistValidation = body('blogId').custom(async (value, {req}) => {
-    const isExistBlogId: BlogViewType | boolean = await blogsRepositories.getBlogById(new ObjectId(value))
+    const isExistBlogId: BlogViewType | boolean = await blogsQueryRepository.getBlogById(new ObjectId(value))
     if (isExistBlogId) {
         return true
     } else {

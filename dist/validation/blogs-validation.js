@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.inputValidationMiddleware = exports.blogIdValidation = exports.blogWebUrlValidation2 = exports.blogWebUrlValidation = exports.blogDescValidation = exports.blogNameValidation = void 0;
 const express_validator_1 = require("express-validator");
 const pattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
-exports.blogNameValidation = (0, express_validator_1.body)('name').trim().isLength({ min: 4, max: 15 }).withMessage({
+exports.blogNameValidation = (0, express_validator_1.body)('name').trim().isLength({ min: 1, max: 15 }).withMessage({
     message: 'name',
     field: 'name'
 });
@@ -41,3 +41,4 @@ const inputValidationMiddleware = (req, res, next) => {
     }
 };
 exports.inputValidationMiddleware = inputValidationMiddleware;
+//# sourceMappingURL=blogs-validation.js.map

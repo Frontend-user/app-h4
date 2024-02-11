@@ -22,3 +22,4 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 startApp();
+//# sourceMappingURL=index.js.map

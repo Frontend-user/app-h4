@@ -16,10 +16,12 @@ exports.testRouter = (0, express_1.Router)({});
 exports.testRouter.delete('/all-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield db_1.client.connect();
-        yield db_1.client.db('blogs').collection('blogs').deleteMany({});
+        yield db_1.client.db('db').collection('blogs').deleteMany({});
+        yield db_1.client.db('db').collection('posts').deleteMany({});
         res.sendStatus(204);
     }
     catch (error) {
         console.error('Ошибка при попытке удалить все данные из бд');
     }
 }));
+//# sourceMappingURL=test-router.js.map

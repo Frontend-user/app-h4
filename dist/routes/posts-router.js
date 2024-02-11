@@ -9,15 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsRouter = void 0;
+exports.postsRouter = exports.postValidators = void 0;
 const express_1 = require("express");
 const auth_validation_1 = require("../validation/auth-validation");
 const posts_validation_1 = require("../validation/posts-validation");
 const blogs_validation_1 = require("../validation/blogs-validation");
-const posts_repositories_1 = require("../repositories/posts-repositories");
 const http_statuses_1 = require("../constants/http-statuses");
 const mongodb_1 = require("mongodb");
-const postValidators = [
+const posts_service_1 = require("../domain/posts-service");
+const posts_query_repository_1 = require("../query-repositories/posts-query/posts-query-repository");
+exports.postValidators = [
     auth_validation_1.authorizationMiddleware,
     posts_validation_1.postTitleValidation,
     posts_validation_1.postDescValidation,
@@ -29,7 +30,27 @@ const postValidators = [
 exports.postsRouter = (0, express_1.Router)({});
 exports.postsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield posts_repositories_1.postsRepositories.getPosts();
+        let searchNameTerm;
+        let sortBy;
+        let sortDirection;
+        let pageNumber;
+        let pageSize;
+        if (req.query.SearchNameTerm) {
+            searchNameTerm = String(req.query.SearchNameTerm);
+        }
+        if (req.query.sortBy) {
+            sortBy = String(req.query.sortBy);
+        }
+        if (req.query.sortDirection) {
+            sortDirection = String(req.query.sortDirection);
+        }
+        if (req.query.pageNumber) {
+            pageNumber = Number(req.query.pageNumber);
+        }
+        if (req.query.pageSize) {
+            pageSize = Number(req.query.pageSize);
+        }
+        const posts = yield posts_query_repository_1.postsQueryRepository.getPosts(sortBy, sortDirection, pageNumber, pageSize);
         res.status(http_statuses_1.HTTP_STATUSES.OK_200).send(posts);
     }
     catch (error) {
@@ -39,7 +60,7 @@ exports.postsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, fun
 }));
 exports.postsRouter.get('/:id', posts_validation_1.postIdValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const post = yield posts_repositories_1.postsRepositories.getPostById(req.params.id);
+        const post = yield posts_query_repository_1.postsQueryRepository.getPostById(req.params.id);
         if (!post) {
             res.sendStatus(http_statuses_1.HTTP_STATUSES.NOT_FOUND_404);
             return;
@@ -50,7 +71,7 @@ exports.postsRouter.get('/:id', posts_validation_1.postIdValidation, (req, res) 
         res.sendStatus(http_statuses_1.HTTP_STATUSES.NOT_FOUND_404);
     }
 }));
-exports.postsRouter.post('/', ...postValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post('/', ...exports.postValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let newPost = {
         title: req.body.title,
         shortDescription: req.body.shortDescription,
@@ -60,9 +81,9 @@ exports.postsRouter.post('/', ...postValidators, (req, res) => __awaiter(void 0,
         createdAt: new Date().toISOString()
     };
     try {
-        const response = yield posts_repositories_1.postsRepositories.createPost(newPost);
+        const response = yield posts_service_1.postsService.createPost(newPost);
         if (response instanceof mongodb_1.ObjectId) {
-            const createdPost = yield posts_repositories_1.postsRepositories.getPostById(response);
+            const createdPost = yield posts_query_repository_1.postsQueryRepository.getPostById(response);
             res.status(http_statuses_1.HTTP_STATUSES.CREATED_201).send(createdPost);
             return;
         }
@@ -72,7 +93,7 @@ exports.postsRouter.post('/', ...postValidators, (req, res) => __awaiter(void 0,
         res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
     }
 }));
-exports.postsRouter.put('/:id', ...postValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.put('/:id', ...exports.postValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let postDataToUpdate = {
         title: req.body.title,
         shortDescription: req.body.shortDescription,
@@ -80,7 +101,7 @@ exports.postsRouter.put('/:id', ...postValidators, (req, res) => __awaiter(void 
         blogId: req.body.blogId
     };
     try {
-        const response = yield posts_repositories_1.postsRepositories.updatePost(new mongodb_1.ObjectId(req.params.id), postDataToUpdate);
+        const response = yield posts_service_1.postsService.updatePost(new mongodb_1.ObjectId(req.params.id), postDataToUpdate);
         res.sendStatus(response ? http_statuses_1.HTTP_STATUSES.NO_CONTENT_204 : http_statuses_1.HTTP_STATUSES.NOT_FOUND_404);
     }
     catch (error) {
@@ -89,10 +110,11 @@ exports.postsRouter.put('/:id', ...postValidators, (req, res) => __awaiter(void 
 }));
 exports.postsRouter.delete('/:id', auth_validation_1.authorizationMiddleware, posts_validation_1.postIdValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield posts_repositories_1.postsRepositories.deletePost(new mongodb_1.ObjectId(req.params.id));
+        const response = yield posts_service_1.postsService.deletePost(new mongodb_1.ObjectId(req.params.id));
         res.sendStatus(response ? http_statuses_1.HTTP_STATUSES.NO_CONTENT_204 : http_statuses_1.HTTP_STATUSES.NOT_FOUND_404);
     }
     catch (error) {
         res.sendStatus(http_statuses_1.HTTP_STATUSES.NOT_FOUND_404);
     }
 }));
+//# sourceMappingURL=posts-router.js.map

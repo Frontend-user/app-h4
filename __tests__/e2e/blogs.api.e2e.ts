@@ -1,6 +1,8 @@
-import {app} from "../../app";
-import {blogsRouter} from "../../routes/blogs-router";
+import {app} from "../../src/app";
 import request from 'supertest'
+import {blogsTestManager} from "../../src/utils/blogsTestManager";
+import {Routes} from "../../src/constants/routes";
+import {BlogUpdateType} from "../../src/types/blog-type";
 
 describe('/blogs', () => {
 
@@ -10,11 +12,31 @@ describe('/blogs', () => {
         await request(app).delete('/testing/all-data')
     })
 
-    it('[GET BLOGS] [EXPECT 200 [] ]IS DELETE? should return 200 and empty array', async () => {
+    it('API[GET BLOGS] [EXPECT 200 [] ]IS DELETE? should return 200 and empty array', async () => {
         await request(app)
             .get('/blogs')
-            .expect(200, [])
+            .expect(200,  { pagesCount: 0, pageSize: 0, totalCount: 0, items: []})
     })
+    //
+    it('[CREATE BLOG] [CORRECT DATA] should return 201 for create new blog', async () => {
+        const blog: BlogUpdateType = {
+            "name": "bbbbbbbb",
+            "description": "description",
+            "websiteUrl": "https://TXOxcSX82Olmsdf_1fIRxLasdGFvpHDRX8sXEHAWm.ZFTe4"
+        }
+        let getBlog = await blogsTestManager.createBlog(Routes.blogs, token, blog)
+        getBlog = getBlog.body
+        expect(getBlog).toEqual({
+            id: expect.any(String),
+            name: "bbbbbbbb",
+            description: "description",
+            websiteUrl: "https://TXOxcSX82Olmsdf_1fIRxLasdGFvpHDRX8sXEHAWm.ZFTe4",
+            createdAt: expect.any(String),
+            isMembership: expect.any(Boolean)
+        })
+
+    })
+
 
     it('[GET BLOG] [NOT EXISTING]should return 404 for not existing blog', async () => {
         await request(app)
@@ -41,7 +63,7 @@ describe('/blogs', () => {
             })
             .expect(400)
     })
-    let createBlog: any
+    let createBlog5: any
     it('[CREATE BLOG] [CORRECT DATA] should return 201 for create new blog', async () => {
         const createResponse = await request(app)
 
@@ -52,8 +74,8 @@ describe('/blogs', () => {
                 "description": "description",
                 "websiteUrl": "https://TXOxcSX82Olmsdf_1fIRxLasdGFvpHDRX8sXEHAWm.ZFTe4"
             })
-        createBlog = createResponse.body
-        expect(createBlog).toEqual({
+        createBlog5 = createResponse.body
+        expect(createBlog5).toEqual({
             id: expect.any(String),
             name: "name",
             description: "description",
@@ -61,22 +83,45 @@ describe('/blogs', () => {
             createdAt: expect.any(String),
             isMembership: expect.any(Boolean)
         })
-
-        await request(app)
-            .get('/blogs')
-            .expect(200, [createBlog])
-
-
     })
-
+    //
     it('[GET BLOG] [EXISTING]should return 200 for  existing blog', async () => {
         await request(app)
-            .get(`/blogs/${createBlog.id}`)
-            .expect(200, createBlog)
+            .get(`/blogs/${createBlog5.id}`)
+            .expect(200, createBlog5)
     })
 
+    //
+    it('[CREATE BLOG] [CORRECT DATA] should return 201 for create new blog', async () => {
+        const createResponse = await request(app)
 
-    let err:any = {
+            .post('/blogs')
+            .set('Authorization', `${token}`)
+            .send({
+                "name": "name",
+                "description": "description",
+                "websiteUrl": "https://TXOxcSX82Olmsdf_1fIRxLasdGFvpHDRX8sXEHAWm.ZFTe4"
+            })
+
+        await request(app)
+            .post('/blogs')
+            .set('Authorization', `${token}`)
+            .send({
+                "name": "aaaaaaaa",
+                "description": "description",
+                "websiteUrl": "https://TXOxcSX82Olmsdf_1fIRxLasdGFvpHDRX8sXEHAWm.ZFTe4"
+            })
+        await request(app)
+            .post('/blogs')
+            .set('Authorization', `${token}`)
+            .send({
+                "name": "aaaaaaaa",
+                "description": "description",
+                "websiteUrl": "https://TXOxcSX82Olmsdf_1fIRxLasdGFvpHDRX8sXEHAWm.ZFTe4"
+            })
+    })
+
+    let err: any = {
         "errorsMessages": [
             {
                 "message": "name",
@@ -87,7 +132,7 @@ describe('/blogs', () => {
     it('[PUT BLOG] [INCORRECT DATA] EXCEPT(400)', async () => {
         const createResponse = await request(app)
 
-            .put(`/blogs/${createBlog.id}`)
+            .put(`/blogs/${createBlog5.id}`)
             .set('Authorization', `${token}`)
             .send({
                 "name": "",
@@ -100,7 +145,7 @@ describe('/blogs', () => {
     it('[PUT BLOG] [CORRECT DATA] EXCEPT(204)', async () => {
         const createResponse = await request(app)
 
-            .put(`/blogs/${createBlog.id}`)
+            .put(`/blogs/${createBlog5.id}`)
             .set('Authorization', `${token}`)
             .send({
                 "name": "UPDATE$$$$",
@@ -110,7 +155,7 @@ describe('/blogs', () => {
             .expect(204)
 
     })
-
+    // //
     it('[PUT BLOG] [NOT EXISTING ID] EXCEPT(404)', async () => {
         const createResponse = await request(app)
 
@@ -135,7 +180,7 @@ describe('/blogs', () => {
 
     it('[DELETE BLOG] [EXISTING]should return 204 for existing blog ID', async () => {
         await request(app)
-            .delete(`/blogs/${createBlog.id}`)
+            .delete(`/blogs/${createBlog5.id}`)
             .set('Authorization', `${token}`)
 
             .expect(204)

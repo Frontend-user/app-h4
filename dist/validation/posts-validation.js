@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postIdValidation = exports.postBlogIdExistValidation = exports.postBlogIdValidation = exports.postContentValidation = exports.postDescValidation = exports.postTitleValidation = void 0;
+const blogs_query_repository_1 = require("../query-repositories/blogs-query/blogs-query-repository");
 const express_validator_1 = require("express-validator");
-const blogs_repositories_1 = require("../repositories/blogs-repositories");
 const mongodb_1 = require("mongodb");
 exports.postTitleValidation = (0, express_validator_1.body)('title').trim().isLength({ min: 4, max: 30 }).withMessage({
     message: 'title is wrong',
@@ -30,7 +30,7 @@ exports.postBlogIdValidation = (0, express_validator_1.body)('blogId').trim().is
     field: 'id'
 });
 exports.postBlogIdExistValidation = (0, express_validator_1.body)('blogId').custom((value, { req }) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExistBlogId = yield blogs_repositories_1.blogsRepositories.getBlogById(new mongodb_1.ObjectId(value));
+    const isExistBlogId = yield blogs_query_repository_1.blogsQueryRepository.getBlogById(new mongodb_1.ObjectId(value));
     if (isExistBlogId) {
         return true;
     }
@@ -45,3 +45,4 @@ exports.postIdValidation = (0, express_validator_1.body)('id').trim().isLength({
     message: 'id is wrong',
     field: 'id'
 });
+//# sourceMappingURL=posts-validation.js.map

@@ -11,28 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepositories = void 0;
 const db_1 = require("./db");
-const mongodb_1 = require("mongodb");
-const changeIdFormat = (obj) => {
-    console.log(obj, 'obj');
-    obj.id = obj._id;
-    delete obj._id;
-    console.log(obj, 'obj After dELETE');
-    return obj;
-};
 exports.postsRepositories = {
-    getPosts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const posts = yield db_1.postsCollection.find({}).toArray();
-            const fixArrayIds = posts.map((item => changeIdFormat(item)));
-            return fixArrayIds.length > 0 ? fixArrayIds : [];
-        });
-    },
-    getPostById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const post = yield db_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-            return post ? changeIdFormat(post) : false;
-        });
-    },
     createPost(post) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield db_1.postsCollection.insertOne(post);
@@ -52,3 +31,4 @@ exports.postsRepositories = {
         });
     },
 };
+//# sourceMappingURL=posts-repositories.js.map
